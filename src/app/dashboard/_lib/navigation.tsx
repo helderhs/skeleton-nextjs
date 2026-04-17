@@ -9,6 +9,7 @@ export interface DashboardNavigationItem {
   label: string;
   icon: ReactNode;
   path: string;
+  requiresUserManagementAccess?: boolean;
 }
 
 export interface DashboardNavigationSection {
@@ -21,7 +22,12 @@ export const dashboardNavigationSections: DashboardNavigationSection[] = [
     label: 'Menu principal',
     items: [
       { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-      { label: 'Usuarios', icon: <PeopleIcon />, path: '/dashboard/users' },
+      {
+        label: 'Usuarios',
+        icon: <PeopleIcon />,
+        path: '/dashboard/users',
+        requiresUserManagementAccess: true,
+      },
     ],
   },
   {
@@ -36,6 +42,21 @@ export const dashboardNavigationSections: DashboardNavigationSection[] = [
   },
 ];
 
+export function getDashboardNavigationSections({
+  canManageUsers,
+}: {
+  canManageUsers: boolean;
+}) {
+  return dashboardNavigationSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) => !item.requiresUserManagementAccess || canManageUsers
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
+}
+
 export function isDashboardRouteActive(pathname: string, path: string) {
   if (path === '/dashboard') {
     return pathname === path;
@@ -46,7 +67,9 @@ export function isDashboardRouteActive(pathname: string, path: string) {
 
 export function getDashboardPageTitle(pathname: string) {
   const item = dashboardNavigationSections
-    .flatMap((section) => section.items)
+    .flatMap((section) =>
+      section.items.map((entry) => ({ label: entry.label, path: entry.path }))
+    )
     .sort((left, right) => right.path.length - left.path.length)
     .find((entry) => isDashboardRouteActive(pathname, entry.path));
 

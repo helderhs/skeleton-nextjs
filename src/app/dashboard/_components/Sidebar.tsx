@@ -18,19 +18,25 @@ import {
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
-  dashboardNavigationSections,
+  getDashboardNavigationSections,
   isDashboardRouteActive,
 } from '../_lib/navigation';
 
 export const DRAWER_WIDTH = 280;
 
 interface SidebarProps {
+  canManageUsers: boolean;
   mobileOpen: boolean;
   onClose: () => void;
 }
 
-export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
+export default function Sidebar({
+  canManageUsers,
+  mobileOpen,
+  onClose,
+}: SidebarProps) {
   const pathname = usePathname();
+  const navigationSections = getDashboardNavigationSections({ canManageUsers });
 
   const drawerContent = (
     <Box
@@ -80,7 +86,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       <Divider sx={{ mx: 2, opacity: 0.5 }} />
 
       <Box sx={{ flex: 1, py: 2, px: 1 }}>
-        {dashboardNavigationSections.map((section, index) => (
+        {navigationSections.map((section, index) => (
           <Box key={section.label} sx={{ mt: index === 0 ? 0 : 3 }}>
             <Typography
               variant="overline"

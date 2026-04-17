@@ -38,9 +38,14 @@ interface EditableUser {
 interface UserFormProps {
   mode: 'create' | 'edit';
   initialUser?: EditableUser;
+  variant?: 'user' | 'profile';
 }
 
-export default function UserForm({ mode, initialUser }: UserFormProps) {
+export default function UserForm({
+  mode,
+  initialUser,
+  variant = 'user',
+}: UserFormProps) {
   const router = useRouter();
   const [name, setName] = useState(initialUser?.name ?? '');
   const [email, setEmail] = useState(initialUser?.email ?? '');
@@ -50,12 +55,35 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const isCreateMode = mode === 'create';
+  const isProfileMode = !isCreateMode && variant === 'profile';
+
+  const backHref = isProfileMode ? '/dashboard' : '/dashboard/users';
+  const backLabel = isProfileMode
+    ? 'Voltar para dashboard'
+    : 'Voltar para usuarios';
+  const pageTitle = isCreateMode
+    ? 'Novo usuario'
+    : isProfileMode
+      ? 'Meu perfil'
+      : 'Editar usuario';
+  const pageSubtitle = isCreateMode
+    ? 'Preencha os dados para cadastrar um novo usuario.'
+    : isProfileMode
+      ? 'Atualize seus dados e altere sua senha quando precisar.'
+      : 'Atualize os dados do usuario selecionado.';
+  const submitLabel = isCreateMode
+    ? 'Cadastrar usuario'
+    : isProfileMode
+      ? 'Salvar perfil'
+      : 'Salvar alteracoes';
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
+    setSuccess('');
 
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
@@ -87,15 +115,18 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
     setLoading(true);
 
     try {
+      const requestUrl = isCreateMode
+        ? '/api/users'
+        : `/api/users/${initialUser?._id}${isProfileMode ? '?profile=1' : ''}`;
       const response = await fetch(
-        isCreateMode ? '/api/users' : `/api/users/${initialUser?._id}`,
+        requestUrl,
         {
           method: isCreateMode ? 'POST' : 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: trimmedName,
             email: trimmedEmail,
-            role,
+            role: isProfileMode ? undefined : role,
             password: trimmedPassword || undefined,
           }),
         }
@@ -104,6 +135,16 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
 
       if (!response.ok) {
         throw new Error(data.error || 'Erro ao salvar usuario');
+      }
+
+      if (isProfileMode) {
+        setName(data.data?.name ?? trimmedName);
+        setEmail(data.data?.email ?? trimmedEmail);
+        setPassword('');
+        setConfirmPassword('');
+        setSuccess(data.message || 'Perfil atualizado com sucesso');
+        router.refresh();
+        return;
       }
 
       router.push(
@@ -126,7 +167,7 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
       <Box>
         <MuiLink
           component={Link}
-          href="/dashboard/users"
+          href={backHref}
           sx={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -138,16 +179,14 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
           }}
         >
           <ArrowBackIcon sx={{ fontSize: 16 }} />
-          Voltar para usuarios
+          {backLabel}
         </MuiLink>
 
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
-          {isCreateMode ? 'Novo usuario' : 'Editar usuario'}
+          {pageTitle}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          {isCreateMode
-            ? 'Preencha os dados para cadastrar um novo usuario.'
-            : 'Atualize os dados do usuario selecionado.'}
+          {pageSubtitle}
         </Typography>
       </Box>
 
@@ -156,6 +195,7 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%' }}>
             <Stack spacing={2.5}>
               {error && <Alert severity="error">{error}</Alert>}
+              {success && <Alert severity="success">{success}</Alert>}
 
               <TextField
                 label="Nome"
@@ -192,17 +232,19 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
                 }}
               />
 
-              <TextField
-                select
-                label="Tipo de usuario"
-                value={role}
-                onChange={(event) => setRole(event.target.value as UserRole)}
-                fullWidth
-                helperText="Novos usuarios iniciam como user por padrao"
-              >
-                <MenuItem value="user">user</MenuItem>
-                <MenuItem value="admin">admin</MenuItem>
-              </TextField>
+              {!isProfileMode && (
+                <TextField
+                  select
+                  label="Tipo de usuario"
+                  value={role}
+                  onChange={(event) => setRole(event.target.value as UserRole)}
+                  fullWidth
+                  helperText="Novos usuarios iniciam como user por padrao"
+                >
+                  <MenuItem value="user">user</MenuItem>
+                  <MenuItem value="admin">admin</MenuItem>
+                </TextField>
+              )}
 
               <TextField
                 label={isCreateMode ? 'Senha' : 'Nova senha'}
@@ -260,7 +302,7 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
               <Stack direction="row" spacing={1.5} sx={{ pt: 1 }}>
                 <Button
                   component={Link}
-                  href="/dashboard/users"
+                  href={backHref}
                   variant="outlined"
                   disabled={loading}
                 >
@@ -269,10 +311,8 @@ export default function UserForm({ mode, initialUser }: UserFormProps) {
                 <Button type="submit" variant="contained" disabled={loading}>
                   {loading ? (
                     <CircularProgress size={22} color="inherit" />
-                  ) : isCreateMode ? (
-                    'Cadastrar usuario'
                   ) : (
-                    'Salvar alteracoes'
+                    submitLabel
                   )}
                 </Button>
               </Stack>

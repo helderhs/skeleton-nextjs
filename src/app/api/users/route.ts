@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createUser, listUsers } from '@/services/userService';
+import { getRequestSessionUser } from '@/lib/session';
+import { canUserManageUsers } from '@/lib/userManagementAccess';
 import type { CreateUserDTO, UserRole } from '@/types';
 
 export const dynamic = 'force-dynamic';
+
+async function validateUserManagementAccess(request: NextRequest) {
+  const sessionUser = await getRequestSessionUser(request);
+
+  if (!sessionUser) {
+    return NextResponse.json(
+      { success: false, error: 'Nao autenticado' },
+      { status: 401 }
+    );
+  }
+
+  if (!canUserManageUsers(sessionUser)) {
+    return NextResponse.json(
+      { success: false, error: 'Acesso negado' },
+      { status: 403 }
+    );
+  }
+
+  return null;
+}
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -28,6 +50,12 @@ function getPositiveInteger(value: string | null, fallback: number) {
 
 export async function GET(request: NextRequest) {
   try {
+    const accessError = await validateUserManagementAccess(request);
+
+    if (accessError) {
+      return accessError;
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get('q') ?? '';
     const page = getPositiveInteger(searchParams.get('page'), 1);
@@ -48,6 +76,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const accessError = await validateUserManagementAccess(request);
+
+    if (accessError) {
+      return accessError;
+    }
+
     const body = (await request.json()) as Partial<CreateUserDTO>;
     const name = getRequiredString(body.name);
     const email = getRequiredString(body.email);

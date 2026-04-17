@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Box, Toolbar } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,27 +10,42 @@ import Sidebar, { DRAWER_WIDTH } from './Sidebar';
 import { getDashboardPageTitle } from '../_lib/navigation';
 
 export default function DashboardShell({
+  canManageUsers,
   children,
 }: {
+  canManageUsers: boolean;
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user, logout } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen((current) => !current);
   };
 
+  const isProfilePage =
+    pathname.startsWith('/dashboard/users/') &&
+    searchParams.get('profile') === '1';
+  const headerTitle = isProfilePage
+    ? 'Perfil'
+    : getDashboardPageTitle(pathname);
+
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Header
-        title={getDashboardPageTitle(pathname)}
+        title={headerTitle}
         onMenuToggle={handleDrawerToggle}
         userName={user?.name}
+        profileHref={user ? `/dashboard/users/${user._id}?profile=1` : '/dashboard'}
         onLogout={logout}
       />
-      <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <Sidebar
+        canManageUsers={canManageUsers}
+        mobileOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+      />
       <Box
         component="main"
         sx={{

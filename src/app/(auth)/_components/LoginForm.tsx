@@ -22,7 +22,13 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function LoginForm() {
+interface LoginFormProps {
+  showRegisterLink?: boolean;
+}
+
+export default function LoginForm({
+  showRegisterLink = true,
+}: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -154,23 +160,25 @@ export default function LoginForm() {
         {loading ? <CircularProgress size={24} color="inherit" /> : 'Entrar'}
       </Button>
 
-      <Box sx={{ textAlign: 'center', mt: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          Nao tem uma conta?{' '}
-          <MuiLink
-            component={Link}
-            href="/register"
-            sx={{
-              color: 'primary.main',
-              textDecoration: 'none',
-              fontWeight: 600,
-              '&:hover': { textDecoration: 'underline' },
-            }}
-          >
-            Cadastre-se
-          </MuiLink>
-        </Typography>
-      </Box>
+      {showRegisterLink && (
+        <Box sx={{ textAlign: 'center', mt: 3 }}>
+          <Typography variant="body2" color="text.secondary">
+            Nao tem uma conta?{' '}
+            <MuiLink
+              component={Link}
+              href="/register"
+              sx={{
+                color: 'primary.main',
+                textDecoration: 'none',
+                fontWeight: 600,
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              Cadastre-se
+            </MuiLink>
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 }

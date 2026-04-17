@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deleteUser, findUserById, updateUser } from '@/services/userService';
+import { getRequestSessionUser } from '@/lib/session';
+import {
+  canAccessManagedUser,
+  canUserManageUsers,
+  isOwnProfileRoute,
+} from '@/lib/userManagementAccess';
 import type { UpdateUserDTO, UserRole } from '@/types';
 
 export const dynamic = 'force-dynamic';
+
+function isProfileRequest(request: NextRequest) {
+  return request.nextUrl.searchParams.get('profile') === '1';
+}
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -21,11 +31,33 @@ function getOptionalString(value: unknown) {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await context.params;
+    const sessionUser = await getRequestSessionUser(request);
+
+    if (!sessionUser) {
+      return NextResponse.json(
+        { success: false, error: 'Nao autenticado' },
+        { status: 401, headers: { 'Cache-Control': 'no-store' } }
+      );
+    }
+
+    if (
+      !canAccessManagedUser({
+        sessionUser,
+        targetUserId: id,
+        isProfileRoute: isProfileRequest(request),
+      })
+    ) {
+      return NextResponse.json(
+        { success: false, error: 'Acesso negado' },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } }
+      );
+    }
+
     const user = await findUserById(id);
 
     if (!user) {
@@ -53,6 +85,36 @@ export async function PUT(
 ) {
   try {
     const { id } = await context.params;
+    const sessionUser = await getRequestSessionUser(request);
+    const isProfileRoute = isProfileRequest(request);
+
+    if (!sessionUser) {
+      return NextResponse.json(
+        { success: false, error: 'Nao autenticado' },
+        { status: 401 }
+      );
+    }
+
+    if (
+      !canAccessManagedUser({
+        sessionUser,
+        targetUserId: id,
+        isProfileRoute,
+      })
+    ) {
+      return NextResponse.json(
+        { success: false, error: 'Acesso negado' },
+        { status: 403 }
+      );
+    }
+
+    const hasUserManagementAccess = canUserManageUsers(sessionUser);
+    const isOwnProfileAccess = isOwnProfileRoute({
+      sessionUser,
+      targetUserId: id,
+      isProfileRoute,
+    });
+
     const body = (await request.json()) as Partial<UpdateUserDTO>;
     const updateData: UpdateUserDTO = {};
 
@@ -83,6 +145,13 @@ export async function PUT(
     }
 
     if (body.role !== undefined) {
+      if (!hasUserManagementAccess || isOwnProfileAccess) {
+        return NextResponse.json(
+          { success: false, error: 'Acesso negado' },
+          { status: 403 }
+        );
+      }
+
       if (!isValidRole(body.role)) {
         return NextResponse.json(
           { success: false, error: 'Tipo de usuario invalido' },
@@ -145,10 +214,26 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const sessionUser = await getRequestSessionUser(request);
+
+    if (!sessionUser) {
+      return NextResponse.json(
+        { success: false, error: 'Nao autenticado' },
+        { status: 401 }
+      );
+    }
+
+    if (!canUserManageUsers(sessionUser)) {
+      return NextResponse.json(
+        { success: false, error: 'Acesso negado' },
+        { status: 403 }
+      );
+    }
+
     const { id } = await context.params;
     const removed = await deleteUser(id);
 

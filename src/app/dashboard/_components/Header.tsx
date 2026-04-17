@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, type MouseEvent } from 'react';
 import {
   AppBar,
@@ -29,6 +30,7 @@ interface HeaderProps {
   title?: string;
   onMenuToggle: () => void;
   userName?: string;
+  profileHref: string;
   onLogout: () => void;
 }
 
@@ -36,6 +38,7 @@ export default function Header({
   title = 'Dashboard',
   onMenuToggle,
   userName = 'Usuario',
+  profileHref,
   onLogout,
 }: HeaderProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -154,7 +157,11 @@ export default function Header({
             </Typography>
           </Box>
           <Divider sx={{ opacity: 0.5 }} />
-          <MenuItem sx={{ py: 1.2, mt: 0.5 }}>
+          <MenuItem
+            component={Link}
+            href={profileHref}
+            sx={{ py: 1.2, mt: 0.5 }}
+          >
             <ListItemIcon>
               <PersonIcon fontSize="small" />
             </ListItemIcon>

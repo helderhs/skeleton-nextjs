@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, AUTH_COOKIE_NAME } from '@/lib/auth';
+import { isPublicUserRegistrationEnabled } from '@/lib/env';
 
 // Rotas que requerem autenticação
 const protectedPaths = ['/dashboard'];
@@ -40,6 +41,10 @@ export async function proxy(request: NextRequest) {
     if (payload) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
+  }
+
+  if (pathname === '/register' && !isPublicUserRegistrationEnabled()) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();

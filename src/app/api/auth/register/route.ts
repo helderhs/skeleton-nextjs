@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { register } from '@/services/authService';
 import { AUTH_COOKIE_NAME } from '@/lib/auth';
+import { isPublicUserRegistrationEnabled } from '@/lib/env';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!isPublicUserRegistrationEnabled()) {
+      return NextResponse.json(
+        { success: false, error: 'Cadastro publico desabilitado' },
+        { status: 403 }
+      );
+    }
 
     const body = await request.json();
     const { name, email, password, confirmPassword } = body;
