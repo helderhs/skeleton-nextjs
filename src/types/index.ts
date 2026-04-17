@@ -71,3 +71,14 @@ export interface MenuItem {
   path: string;
   children?: MenuItem[];
 }
+
+// --- Password Reset ---
+export interface ForgotPasswordDTO {
+  email: string;
+}
+
+export interface ResetPasswordDTO {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}

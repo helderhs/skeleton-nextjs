@@ -5,7 +5,7 @@ import { verifyToken, AUTH_COOKIE_NAME } from '@/lib/auth';
 const protectedPaths = ['/dashboard'];
 
 // Rotas que só devem ser acessadas por usuários NÃO autenticados
-const authPaths = ['/login', '/register', '/forgot-password'];
+const authPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -51,5 +51,6 @@ export const config = {
     '/login',
     '/register',
     '/forgot-password',
+    '/reset-password',
   ],
 };
