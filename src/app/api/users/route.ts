@@ -38,6 +38,10 @@ function isValidThemeMode(value: unknown): value is ThemeMode {
   return value === 'light' || value === 'dark';
 }
 
+function isValidIsActive(value: unknown): value is boolean {
+  return typeof value === 'boolean';
+}
+
 function getRequiredString(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
@@ -129,12 +133,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (body.isActive !== undefined && !isValidIsActive(body.isActive)) {
+      return NextResponse.json(
+        { success: false, error: 'Status do usuario invalido' },
+        { status: 400 }
+      );
+    }
+
     const user = await createUser({
       name,
       email,
       password,
       role: body.role ?? 'user',
       themeMode: body.themeMode ?? 'dark',
+      isActive: body.isActive ?? true,
     });
 
     return NextResponse.json(

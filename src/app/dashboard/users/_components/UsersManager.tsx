@@ -422,6 +422,7 @@ export default function UsersManager() {
                   <TableCell>Nome</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Tipo</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>Criado em</TableCell>
                   <TableCell align="right">Acoes</TableCell>
                 </TableRow>
@@ -440,6 +441,14 @@ export default function UsersManager() {
                           label={user.role}
                           color={user.role === 'admin' ? 'warning' : 'default'}
                           variant="outlined"
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={user.isActive ? 'Ativo' : 'Inativo'}
+                          color={user.isActive ? 'success' : 'default'}
+                          variant={user.isActive ? 'filled' : 'outlined'}
                           size="small"
                         />
                       </TableCell>

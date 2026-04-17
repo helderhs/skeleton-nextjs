@@ -44,6 +44,7 @@ export default async function EditUserPage({
         email: user.email,
         role: user.role,
         themeMode: user.themeMode,
+        isActive: user.isActive,
       }}
     />
   );

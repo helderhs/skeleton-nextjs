@@ -32,6 +32,10 @@ export function normalizeThemeMode(themeMode: string | undefined): ThemeMode {
   return themeMode === 'light' ? 'light' : 'dark';
 }
 
+export function normalizeUserActive(isActive: boolean | undefined) {
+  return isActive !== false;
+}
+
 function toUserResponse(doc: IUserDocument): UserResponse {
   return {
     _id: doc._id.toString(),
@@ -39,6 +43,7 @@ function toUserResponse(doc: IUserDocument): UserResponse {
     email: doc.email,
     role: normalizeRole(doc.role),
     themeMode: normalizeThemeMode(doc.themeMode),
+    isActive: normalizeUserActive(doc.isActive),
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
   };
@@ -60,6 +65,7 @@ export async function createUser(data: CreateUserDTO): Promise<UserResponse> {
     email: normalizedEmail,
     role: normalizeRole(data.role),
     themeMode: normalizeThemeMode(data.themeMode),
+    isActive: normalizeUserActive(data.isActive),
     password: hashedPassword,
   });
 
@@ -143,6 +149,10 @@ export async function updateUser(
 
   if (updateData.themeMode !== undefined) {
     updateData.themeMode = normalizeThemeMode(updateData.themeMode);
+  }
+
+  if (updateData.isActive !== undefined) {
+    updateData.isActive = normalizeUserActive(updateData.isActive);
   }
 
   if (updateData.password) {

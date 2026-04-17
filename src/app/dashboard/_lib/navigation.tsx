@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
-  Settings as SettingsIcon,
 } from '@mui/icons-material';
 
 export interface DashboardNavigationItem {

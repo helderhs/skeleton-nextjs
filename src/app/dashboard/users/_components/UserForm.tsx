@@ -24,6 +24,7 @@ import {
   Lock as LockIcon,
   Palette as PaletteIcon,
   Person as PersonIcon,
+  PowerSettingsNew as PowerSettingsNewIcon,
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material';
@@ -40,6 +41,7 @@ interface EditableUser {
   email: string;
   role: UserRole;
   themeMode: ThemeMode;
+  isActive: boolean;
 }
 
 interface UserFormProps {
@@ -60,6 +62,7 @@ export default function UserForm({
   const [themeMode, setThemeMode] = useState<ThemeMode>(
     initialUser?.themeMode ?? 'dark'
   );
+  const [isActive, setIsActive] = useState(initialUser?.isActive ?? true);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -138,6 +141,7 @@ export default function UserForm({
             email: trimmedEmail,
             role: isProfileMode ? undefined : role,
             themeMode,
+            isActive: isProfileMode ? undefined : isActive,
             password: trimmedPassword || undefined,
           }),
         }
@@ -286,6 +290,33 @@ export default function UserForm({
                 <MenuItem value="dark">dark</MenuItem>
                 <MenuItem value="light">light</MenuItem>
               </TextField>
+
+              {!isProfileMode && (
+                <TextField
+                  select
+                  label="Status do usuario"
+                  value={isActive ? 'active' : 'inactive'}
+                  onChange={(event) =>
+                    setIsActive(event.target.value === 'active')
+                  }
+                  fullWidth
+                  helperText="Usuarios inativos nao conseguem fazer login."
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PowerSettingsNewIcon
+                            sx={{ color: 'text.secondary', fontSize: 20 }}
+                          />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                >
+                  <MenuItem value="active">Ativo</MenuItem>
+                  <MenuItem value="inactive">Inativo</MenuItem>
+                </TextField>
+              )}
 
               <TextField
                 label={isCreateMode ? 'Senha' : 'Nova senha'}

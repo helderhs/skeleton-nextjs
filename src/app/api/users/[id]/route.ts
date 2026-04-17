@@ -26,6 +26,10 @@ function isValidThemeMode(value: unknown): value is ThemeMode {
   return value === 'light' || value === 'dark';
 }
 
+function isValidIsActive(value: unknown): value is boolean {
+  return typeof value === 'boolean';
+}
+
 function getOptionalString(value: unknown) {
   if (typeof value !== 'string') {
     return undefined;
@@ -175,6 +179,24 @@ export async function PUT(
       }
 
       updateData.themeMode = body.themeMode;
+    }
+
+    if (body.isActive !== undefined) {
+      if (!hasUserManagementAccess || isOwnProfileAccess) {
+        return NextResponse.json(
+          { success: false, error: 'Acesso negado' },
+          { status: 403 }
+        );
+      }
+
+      if (!isValidIsActive(body.isActive)) {
+        return NextResponse.json(
+          { success: false, error: 'Status do usuario invalido' },
+          { status: 400 }
+        );
+      }
+
+      updateData.isActive = body.isActive;
     }
 
     if (body.password !== undefined) {

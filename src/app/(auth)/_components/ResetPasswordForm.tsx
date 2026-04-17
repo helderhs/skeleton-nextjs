@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   Alert,
   Box,
@@ -25,7 +25,6 @@ import type { ApiResponse } from '@/types';
 
 function ResetPasswordFormContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const token = searchParams.get('token');
 
   const [password, setPassword] = useState('');

@@ -7,6 +7,7 @@ export interface IUserDocument extends Document {
   password: string;
   role: UserRole;
   themeMode: ThemeMode;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,6 +47,11 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       enum: ['light', 'dark'],
       default: 'dark',
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
       required: true,
     },
   },

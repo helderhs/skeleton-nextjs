@@ -22,7 +22,6 @@ import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
   Person as PersonIcon,
-  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { DRAWER_WIDTH } from './Sidebar';
 

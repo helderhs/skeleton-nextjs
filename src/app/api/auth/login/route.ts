@@ -37,9 +37,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Erro ao fazer login';
+    const status = message === 'Usuario inativo' ? 403 : 401;
     return NextResponse.json(
       { success: false, error: message },
-      { status: 401 }
+      { status }
     );
   }
 }

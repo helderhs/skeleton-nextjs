@@ -3,6 +3,7 @@ import {
   createUser,
   findUserById,
   normalizeThemeMode,
+  normalizeUserActive,
 } from './userService';
 import { comparePassword } from '@/lib/password';
 import { generateToken, verifyToken } from '@/lib/auth';
@@ -26,6 +27,10 @@ export async function login(data: LoginDTO): Promise<AuthSession> {
     throw new Error('Email ou senha invalidos');
   }
 
+  if (!normalizeUserActive(user.isActive)) {
+    throw new Error('Usuario inativo');
+  }
+
   const token = await generateToken({
     userId: user._id.toString(),
     email: user.email,
@@ -39,6 +44,7 @@ export async function login(data: LoginDTO): Promise<AuthSession> {
       email: user.email,
       role: user.role ?? 'user',
       themeMode: normalizeThemeMode(user.themeMode),
+      isActive: normalizeUserActive(user.isActive),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },
@@ -61,6 +67,7 @@ export async function register(data: RegisterDTO): Promise<AuthSession> {
     password: data.password,
     role: 'user',
     themeMode: 'dark',
+    isActive: true,
   });
 
   const token = await generateToken({
@@ -81,5 +88,11 @@ export async function getAuthenticatedUser(
     return null;
   }
 
-  return findUserById(payload.userId);
+  const user = await findUserById(payload.userId);
+
+  if (!user || !user.isActive) {
+    return null;
+  }
+
+  return user;
 }

@@ -13,15 +13,16 @@ export interface IUser {
   password: string;
   role: UserRole;
   themeMode: ThemeMode;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export type CreateUserDTO = Pick<IUser, 'name' | 'email' | 'password'> &
-  Partial<Pick<IUser, 'role' | 'themeMode'>>;
+  Partial<Pick<IUser, 'role' | 'themeMode' | 'isActive'>>;
 
 export type UpdateUserDTO = Partial<
-  Pick<IUser, 'name' | 'email' | 'password' | 'role' | 'themeMode'>
+  Pick<IUser, 'name' | 'email' | 'password' | 'role' | 'themeMode' | 'isActive'>
 >;
 
 export type UserResponse = Omit<IUser, 'password'>;

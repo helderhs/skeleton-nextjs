@@ -3,7 +3,6 @@ import PasswordResetToken from '@/models/PasswordResetToken';
 import { findUserByEmail, findUserById, updateUser } from './userService';
 import { generateResetToken, hashToken } from '@/lib/token';
 import { sendPasswordResetEmail } from '@/lib/email';
-import crypto from 'crypto';
 
 export async function requestPasswordReset(email: string): Promise<void> {
   await dbConnect();
