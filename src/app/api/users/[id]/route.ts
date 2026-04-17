@@ -6,7 +6,7 @@ import {
   canUserManageUsers,
   isOwnProfileRoute,
 } from '@/lib/userManagementAccess';
-import type { UpdateUserDTO, UserRole } from '@/types';
+import type { ThemeMode, UpdateUserDTO, UserRole } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +20,10 @@ function isValidEmail(value: string) {
 
 function isValidRole(value: unknown): value is UserRole {
   return value === 'user' || value === 'admin';
+}
+
+function isValidThemeMode(value: unknown): value is ThemeMode {
+  return value === 'light' || value === 'dark';
 }
 
 function getOptionalString(value: unknown) {
@@ -160,6 +164,17 @@ export async function PUT(
       }
 
       updateData.role = body.role;
+    }
+
+    if (body.themeMode !== undefined) {
+      if (!isValidThemeMode(body.themeMode)) {
+        return NextResponse.json(
+          { success: false, error: 'Modo de tema invalido' },
+          { status: 400 }
+        );
+      }
+
+      updateData.themeMode = body.themeMode;
     }
 
     if (body.password !== undefined) {

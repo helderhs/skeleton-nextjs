@@ -167,12 +167,6 @@ export default function Header({
             </ListItemIcon>
             Perfil
           </MenuItem>
-          <MenuItem sx={{ py: 1.2 }}>
-            <ListItemIcon>
-              <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-            Configuracoes
-          </MenuItem>
           <Divider sx={{ opacity: 0.5 }} />
           <MenuItem
             onClick={onLogout}

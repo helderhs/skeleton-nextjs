@@ -1,5 +1,16 @@
 :root {
   --font-inter: "Inter", sans-serif;
+  --scrollbar-thumb: rgba(148, 163, 184, 0.2);
+  --scrollbar-thumb-hover: rgba(148, 163, 184, 0.35);
+  --autofill-bg: #111827;
+  --autofill-text: #E8ECF4;
+}
+
+body[data-theme="light"] {
+  --scrollbar-thumb: rgba(15, 23, 42, 0.16);
+  --scrollbar-thumb-hover: rgba(15, 23, 42, 0.28);
+  --autofill-bg: #FFFFFF;
+  --autofill-text: #111827;
 }
 
 * {
@@ -31,12 +42,12 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.35);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Suavizar transições de página */
@@ -58,9 +69,9 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus,
 select:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #111827 inset !important;
-  box-shadow: 0 0 0 1000px #111827 inset !important;
-  -webkit-text-fill-color: #E8ECF4 !important;
-  caret-color: #E8ECF4 !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--autofill-bg) inset !important;
+  box-shadow: 0 0 0 1000px var(--autofill-bg) inset !important;
+  -webkit-text-fill-color: var(--autofill-text) !important;
+  caret-color: var(--autofill-text) !important;
   transition: background-color 5000s ease-in-out 0s;
 }

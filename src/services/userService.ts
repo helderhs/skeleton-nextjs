@@ -4,6 +4,7 @@ import { hashPassword } from '@/lib/password';
 import type {
   CreateUserDTO,
   PaginatedResult,
+  ThemeMode,
   UpdateUserDTO,
   UserResponse,
   UserRole,
@@ -27,12 +28,17 @@ function normalizeRole(role: string | undefined): UserRole {
   return role === 'admin' ? 'admin' : 'user';
 }
 
+export function normalizeThemeMode(themeMode: string | undefined): ThemeMode {
+  return themeMode === 'light' ? 'light' : 'dark';
+}
+
 function toUserResponse(doc: IUserDocument): UserResponse {
   return {
     _id: doc._id.toString(),
     name: doc.name,
     email: doc.email,
     role: normalizeRole(doc.role),
+    themeMode: normalizeThemeMode(doc.themeMode),
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
   };
@@ -53,6 +59,7 @@ export async function createUser(data: CreateUserDTO): Promise<UserResponse> {
     ...data,
     email: normalizedEmail,
     role: normalizeRole(data.role),
+    themeMode: normalizeThemeMode(data.themeMode),
     password: hashedPassword,
   });
 
@@ -132,6 +139,10 @@ export async function updateUser(
 
   if (updateData.role !== undefined) {
     updateData.role = normalizeRole(updateData.role);
+  }
+
+  if (updateData.themeMode !== undefined) {
+    updateData.themeMode = normalizeThemeMode(updateData.themeMode);
   }
 
   if (updateData.password) {

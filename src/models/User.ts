@@ -1,11 +1,12 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import type { UserRole } from '@/types';
+import type { ThemeMode, UserRole } from '@/types';
 
 export interface IUserDocument extends Document {
   name: string;
   email: string;
   password: string;
   role: UserRole;
+  themeMode: ThemeMode;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,6 +40,12 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       enum: ['user', 'admin'],
       default: 'user',
+      required: true,
+    },
+    themeMode: {
+      type: String,
+      enum: ['light', 'dark'],
+      default: 'dark',
       required: true,
     },
   },

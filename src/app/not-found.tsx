@@ -13,7 +13,7 @@ export default function NotFound() {
         justifyContent: 'center',
         minHeight: '100vh',
         gap: 2,
-        background: '#0A0E1A',
+        backgroundColor: 'background.default',
       }}
     >
       <Typography

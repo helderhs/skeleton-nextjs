@@ -1,4 +1,9 @@
-import { findUserByEmail, createUser, findUserById } from './userService';
+import {
+  findUserByEmail,
+  createUser,
+  findUserById,
+  normalizeThemeMode,
+} from './userService';
 import { comparePassword } from '@/lib/password';
 import { generateToken, verifyToken } from '@/lib/auth';
 import type {
@@ -33,6 +38,7 @@ export async function login(data: LoginDTO): Promise<AuthSession> {
       name: user.name,
       email: user.email,
       role: user.role ?? 'user',
+      themeMode: normalizeThemeMode(user.themeMode),
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },
@@ -54,6 +60,7 @@ export async function register(data: RegisterDTO): Promise<AuthSession> {
     email: data.email,
     password: data.password,
     role: 'user',
+    themeMode: 'dark',
   });
 
   const token = await generateToken({

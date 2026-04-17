@@ -43,6 +43,7 @@ export default async function EditUserPage({
         name: user.name,
         email: user.email,
         role: user.role,
+        themeMode: user.themeMode,
       }}
     />
   );

@@ -30,16 +30,6 @@ export const dashboardNavigationSections: DashboardNavigationSection[] = [
       },
     ],
   },
-  {
-    label: 'Sistema',
-    items: [
-      {
-        label: 'Configuracoes',
-        icon: <SettingsIcon />,
-        path: '/dashboard/settings',
-      },
-    ],
-  },
 ];
 
 export function getDashboardNavigationSections({

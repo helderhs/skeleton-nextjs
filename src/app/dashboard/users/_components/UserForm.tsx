@@ -22,17 +22,24 @@ import {
   ArrowBack as ArrowBackIcon,
   Email as EmailIcon,
   Lock as LockIcon,
+  Palette as PaletteIcon,
   Person as PersonIcon,
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material';
-import type { ApiResponse, UserResponse, UserRole } from '@/types';
+import type {
+  ApiResponse,
+  ThemeMode,
+  UserResponse,
+  UserRole,
+} from '@/types';
 
 interface EditableUser {
   _id: string;
   name: string;
   email: string;
   role: UserRole;
+  themeMode: ThemeMode;
 }
 
 interface UserFormProps {
@@ -50,6 +57,9 @@ export default function UserForm({
   const [name, setName] = useState(initialUser?.name ?? '');
   const [email, setEmail] = useState(initialUser?.email ?? '');
   const [role, setRole] = useState<UserRole>(initialUser?.role ?? 'user');
+  const [themeMode, setThemeMode] = useState<ThemeMode>(
+    initialUser?.themeMode ?? 'dark'
+  );
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -127,6 +137,7 @@ export default function UserForm({
             name: trimmedName,
             email: trimmedEmail,
             role: isProfileMode ? undefined : role,
+            themeMode,
             password: trimmedPassword || undefined,
           }),
         }
@@ -140,6 +151,7 @@ export default function UserForm({
       if (isProfileMode) {
         setName(data.data?.name ?? trimmedName);
         setEmail(data.data?.email ?? trimmedEmail);
+        setThemeMode(data.data?.themeMode ?? themeMode);
         setPassword('');
         setConfirmPassword('');
         setSuccess(data.message || 'Perfil atualizado com sucesso');
@@ -245,6 +257,35 @@ export default function UserForm({
                   <MenuItem value="admin">admin</MenuItem>
                 </TextField>
               )}
+
+              <TextField
+                select
+                label="Modo do tema"
+                value={themeMode}
+                onChange={(event) =>
+                  setThemeMode(event.target.value as ThemeMode)
+                }
+                fullWidth
+                helperText={
+                  isProfileMode
+                    ? 'Escolha como deseja visualizar a interface.'
+                    : 'Define o modo visual inicial do usuario.'
+                }
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PaletteIcon
+                          sx={{ color: 'text.secondary', fontSize: 20 }}
+                        />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              >
+                <MenuItem value="dark">dark</MenuItem>
+                <MenuItem value="light">light</MenuItem>
+              </TextField>
 
               <TextField
                 label={isCreateMode ? 'Senha' : 'Nova senha'}

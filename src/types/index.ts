@@ -4,6 +4,7 @@
 
 // --- User ---
 export type UserRole = 'user' | 'admin';
+export type ThemeMode = 'light' | 'dark';
 
 export interface IUser {
   _id: string;
@@ -11,15 +12,16 @@ export interface IUser {
   email: string;
   password: string;
   role: UserRole;
+  themeMode: ThemeMode;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export type CreateUserDTO = Pick<IUser, 'name' | 'email' | 'password'> &
-  Partial<Pick<IUser, 'role'>>;
+  Partial<Pick<IUser, 'role' | 'themeMode'>>;
 
 export type UpdateUserDTO = Partial<
-  Pick<IUser, 'name' | 'email' | 'password' | 'role'>
+  Pick<IUser, 'name' | 'email' | 'password' | 'role' | 'themeMode'>
 >;
 
 export type UserResponse = Omit<IUser, 'password'>;

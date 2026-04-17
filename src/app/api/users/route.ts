@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createUser, listUsers } from '@/services/userService';
 import { getRequestSessionUser } from '@/lib/session';
 import { canUserManageUsers } from '@/lib/userManagementAccess';
-import type { CreateUserDTO, UserRole } from '@/types';
+import type { CreateUserDTO, ThemeMode, UserRole } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +32,10 @@ function isValidEmail(value: string) {
 
 function isValidRole(value: unknown): value is UserRole {
   return value === 'user' || value === 'admin';
+}
+
+function isValidThemeMode(value: unknown): value is ThemeMode {
+  return value === 'light' || value === 'dark';
 }
 
 function getRequiredString(value: unknown) {
@@ -118,11 +122,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (body.themeMode !== undefined && !isValidThemeMode(body.themeMode)) {
+      return NextResponse.json(
+        { success: false, error: 'Modo de tema invalido' },
+        { status: 400 }
+      );
+    }
+
     const user = await createUser({
       name,
       email,
       password,
       role: body.role ?? 'user',
+      themeMode: body.themeMode ?? 'dark',
     });
 
     return NextResponse.json(
